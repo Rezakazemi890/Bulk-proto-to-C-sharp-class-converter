@@ -3,7 +3,7 @@
 ![Project Status](https://img.shields.io/badge/status-active-brightgreen.svg)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-The Proto to C# Bulk Converter is a powerful tool designed to simplify the process of converting one or more .proto files into .cs files. Whether you have a single .proto file or a batch of them, this tool provides an efficient and automated solution to generate the corresponding C# code.
+The **Proto to C# Bulk Converter** is a powerful tool designed to simplify the process of converting one or more .proto files into .cs files. Whether you have a single .proto file or a batch of them, this tool provides an efficient and automated solution to generate the corresponding C# code.
 
 ## Contributors
 
@@ -14,9 +14,9 @@ We would like to extend our sincere thanks to the following contributors who hav
 
 ## Features
 
-- Bulk conversion: Convert multiple .proto files to .cs files in one go.
-- Support for various data types: The converter provides comprehensive support for all data types in your .proto files, including message types, primitive types, and custom types.
-- User-friendly interface: The tool is equipped with a modern and intuitive user interface for an enhanced user experience.
+- **Bulk conversion:** Convert multiple .proto files to .cs files in one go.
+- **Support for various data types:** The converter provides comprehensive support for all data types in your .proto files, including message types, primitive types, and custom types.
+- **User-friendly interface:** The tool is equipped with a modern and intuitive user interface for an enhanced user experience.
 
 ## How to Use
 
@@ -28,14 +28,14 @@ We would like to extend our sincere thanks to the following contributors who hav
    ```
 
 2. **Navigate to the Source Folder:**
-   Once cloned, navigate to the `src` folder:
+   Once cloned, navigate to the **`src`** folder:
 
    ```sh
    cd proto-to-csharp-bulk-converter/src
    ```
 
 3. **Run the Converter:**
-   Open the `ProtoConverter-V2-New.html` file in your preferred web browser. You can run it locally without the need for a web server.
+   Open the **`ProtoConverter-V2-New.html`** file in your preferred web browser. You can run it locally without the need for a web server.
 
 4. **Select .proto Files:**
    Click the "Choose Files" button to select one or more .proto files that you want to convert to C#.
