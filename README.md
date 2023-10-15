@@ -24,7 +24,7 @@ We would like to extend our sincere thanks to the following contributors who hav
    Clone this repository to your local machine using the following command:
 
    ```sh
-   git clone https://github.com/your-username/proto-to-csharp-bulk-converter.git
+   git clone https://github.com/Rezakazemi890/Bulk-proto-to-C-sharp-class-converter.git
    ```
 
 2. **Navigate to the Source Folder:**
