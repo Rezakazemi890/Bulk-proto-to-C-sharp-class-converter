@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proto to C# Bulk Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 5px;
+        }
+
+        .input-group {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .input-group input[type="file"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .convert-button {
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        .output {
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Proto to C# Bulk Converter</h1>
+    <div class="container">
+        <div class="input-group">
+            <input type="file" id="fileInput" multiple accept=".proto">
+            <button class="convert-button" id="convertButton">Convert to C#</button>
+        </div>
+        <div class="output" id="output"></div>
+    </div>
+
+    <script src="jszip.min.js"></script>
+    <script src="FileSaver.min.js"></script>
+    <script>
+        document.getElementById("convertButton").addEventListener("click", function () {
+            console.log("Button clicked!");
+            const fileInput = document.getElementById("fileInput");
+            const outputDiv = document.getElementById("output");
+            const files = fileInput.files;
+
+            if (files.length === 0) {
+                outputDiv.innerHTML = "Please select one or more .proto files.";
+                return;
+            }
+
+            const zip = new JSZip();
+            const promises = [];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+
+                reader.onload = function (event) {
+                    const protoContent = event.target.result;
+                    const csharpCode = convertProtoToCSharp(protoContent);
+
+                    // Add the generated C# code to the zip file.
+                    zip.file(`${file.name.replace(".proto", "")}.cs`, csharpCode);
+                };
+
+                promises.push(new Promise((resolve, reject) => {
+                    reader.onloadend = resolve;
+                    reader.onerror = reject;
+                }));
+
+                reader.readAsText(file);
+            }
+
+            Promise.all(promises)
+                .then(() => {
+                    // Generate the zip file and provide a download link.
+                    zip.generateAsync({ type: "blob" })
+                        .then(function (content) {
+                            const zipFileName = "generated_csharp.zip";
+                            saveAs(content, zipFileName);
+
+                            outputDiv.innerHTML = `Conversion complete. Download your files: <a href="${zipFileName}" download>${zipFileName}</a>`;
+                        });
+                })
+                .catch((error) => {
+                    outputDiv.innerHTML = `Error: ${error.message}`;
+                });
+        });
+
+        function convertProtoToCSharp(protoContent) {
+
+            var newLine = "\r\n";
+            var tab = "\t";
+            return generateCSharp();
+            function generateCSharp() {
+                var protoRaw = protoContent;
+                var protoLines = protoRaw.split(/[\r\n]+/);
+
+                var protoVersion = 2;
+                var packageName = "";
+
+                var messages = [];
+
+                for (var i = 0; i < protoLines.length; i++) {
+                    var line = protoLines[i].trim();
+                    if (line.startsWith("syntax")) {
+                        protoVersion = getProtoVersion(line);
+                    }
+                    else if (line.startsWith("package")) {
+                        packageName = getPackageName(line);
+                    }
+                    else if (line.startsWith("message")) {
+                        var skipLines = 0;
+                        var message = getMessage(protoLines, i, skipLines);
+                        messages.push(message);
+                        i += skipLines;
+                        //console.log(message);
+                    }
+                }
+
+                return getCSharpClasses(packageName, messages);
+            }
+
+            function getProtoVersion(line) {
+                var spot1 = line.indexOf("\"");
+                var spot2 = line.indexOf("\"", spot1 + 1);
+                var protoVersionValue = line.substring(spot1 + 1, spot2).trim().toLowerCase();
+                return protoVersionValue === "proto3" ? 3 : 2;
+            }
+
+            function getPackageName(line) {
+                var spot1 = line.indexOf(" ");
+                var len = line.length;
+                var packageNameValue = line.substring(spot1 + 1, len - 1).trim();
+                if (packageNameValue.endsWith(";")) {
+                    packageNameValue = packageNameValue.substring(0, len - 2);
+                }
+                return packageNameValue;
+            }
+
+            function getMessage(protoLines, startingLineIndex, outSkipLines) {
+                var message = {
+                    name: "",
+                    properties: []
+                };
+
+                var line = protoLines[startingLineIndex].trim();
+                var spot1 = line.indexOf(" ");
+                var spot2 = -1;
+
+                while (true) {
+                    spot2 = line.indexOf("{", spot1 + 1);
+                    if (spot2 != -1 || startingLineIndex >= protoLines.length) {
+                        break;
+                    }
+                    startingLineIndex += 1;
+                    outSkipLines += 1;
+                    line += protoLines[startingLineIndex].trim();
+                }
+                if (spot2 == -1) {
+                    spot2 = line.length;
+                }
+                message.name = line.substring(spot1 + 1, spot2).trim();
+
+                var sb = "";
+                for (var i = startingLineIndex + 1; i < protoLines.length; i++) {
+                    outSkipLines += 1;
+                    var peekLine = protoLines[i];
+                    sb += peekLine;
+                    if (peekLine.indexOf("}") > -1) {
+                        break;
+                    }
+                }
+
+                var props = sb.split(";");
+                for (var i = 0; i < props.length; i++) {
+                    var prop = props[i].trim();
+                    var typeSpot = prop.indexOf(" ");
+                    var nameSpot = prop.indexOf("=", typeSpot + 1);
+                    var property = {
+                        type: prop.substring(0, typeSpot).trim(),
+                        name: prop.substring(typeSpot + 1, nameSpot).trim(),
+                        id: parseInt(prop.substring(nameSpot + 1, prop.len).trim())
+                    };
+                    if (property.type === "") {
+                        //console.log("type is empty");
+                        continue;
+                    }
+                    if (property.name === "") {
+                        //console.log("name is empty");
+                        continue;
+                    }
+                    if (isNaN(property.id)) {
+                        //console.log("id is nan");
+                        continue;
+                    }
+                    message.properties.push(property);
+                }
+
+                return message;
+            }
+
+            function getCSharpClasses(packageName, messages) {
+                var sb = "using System;" + newLine;
+
+                var contractAttribute = "[DataContract]";
+                var memberAttribute = "[DataMember(Order = #)]";
+
+                var usingNamespace = getRadioValue("attributeType");
+                sb += "using " + usingNamespace + ";" + newLine;
+                if (usingNamespace === "ProtoBuf") {
+                    contractAttribute = "[ProtoContract]";
+                    memberAttribute = "[ProtoMember(#)]";
+                }
+
+                sb += newLine;
+                var tabs = "";
+
+                if (packageName.length > 0) {
+                    sb += tabs + "namespace " + packageName + newLine;
+                    sb += tabs + "{" + newLine;
+                    tabs += tab;
+                }
+
+                for (var i = 0; i < messages.length; i++) {
+                    var csharpClass = getCSharpClass(packageName, messages[i], tabs, "", "");
+                    if (i > 0) {
+                        sb += newLine;
+                    }
+                    sb += csharpClass;
+                }
+
+                if (packageName.length > 0) {
+                    tabs = tabs.substring(0, tabs.length - 1);
+                    sb += tabs + "}" + newLine;
+                }
+
+                return sb;
+            }
+
+            function getCSharpClass(packageName, message, tabs, contractAttribute, memberAttribute) {
+                var sb = "";
+                sb += tabs + contractAttribute + newLine;
+                sb += tabs + "public class " + message.name + newLine;
+                sb += tabs + "{" + newLine;
+                tabs += tab;
+
+                for (var i = 0; i < message.properties.length; i++) {
+                    sb += tabs + memberAttribute.replace("#", message.properties[i].id) + newLine;
+                    sb += tabs + "public " + getDotNetType(message.properties[i].type) + " " + message.properties[i].name + " { get; set; }" + newLine;
+                    sb += newLine;
+                }
+
+                tabs = tabs.substring(0, tabs.length - 1);
+                sb += tabs + "}" + newLine;
+                return sb;
+            }
+
+            function getRadioValue(name) {
+                var radios = document.getElementsByName(name);
+                for (var i = 0; i < radios.length; i++) {
+                    if (radios[i].checked) {
+                        return radios[i].value;
+                    }
+                }
+                return null;
+            }
+
+            function getDotNetType(protoType) {
+                switch (protoType) {
+                    case "sfixed32":
+                    case "sint32":
+                    case "int32":
+                        return "int";
+
+                    case "string":
+                        return "string";
+
+                    case "double":
+                        return "double";
+
+                    case "float":
+                        return "float";
+
+                    case "fixed32":
+                    case "uint32":
+                        return "uint";
+
+                    case "fixed64":
+                    case "uint64":
+                        return "ulong";
+
+                    case "int64":
+                    case "sint64":
+                    case "sfixed64":
+                        return "long";
+
+                    case "bool":
+                        return "bool";
+
+                    case "bytes":
+                        return "byte[]";
+
+                    default:
+                        return protoType;
+                }
+            }
+        }
+    </script>
+</body>
+
+</html>
