@@ -31,7 +31,7 @@ We would like to extend our sincere thanks to the following contributors who hav
    Once cloned, navigate to the **`src`** folder:
 
    ```sh
-   cd proto-to-csharp-bulk-converter/src
+   cd Bulk-proto-to-C-sharp-class-converter/src
    ```
 
 3. **Run the Converter:**
