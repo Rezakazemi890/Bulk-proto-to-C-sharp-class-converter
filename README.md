@@ -53,6 +53,6 @@ We would like to extend our sincere thanks to the following contributors who hav
 
 This project is open-source and available under the [MIT License](LICENSE). Feel free to use, modify, and distribute it in accordance with the license terms.
 
-We welcome contributions, bug reports, and feature requests. If you encounter any issues or have suggestions for improvement, please don't hesitate to submit a [GitHub issue](https://github.com/your-username/proto-to-csharp-bulk-converter/issues).
+We welcome contributions, bug reports, and feature requests. If you encounter any issues or have suggestions for improvement, please don't hesitate to submit a [GitHub issue](https://github.com/Rezakazemi890/Bulk-proto-to-C-sharp-class-converter/issues).
 
 Thank you for using the Proto to C# Bulk Converter, and we hope it simplifies your .proto to .cs conversion needs!
