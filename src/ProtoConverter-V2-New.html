@@ -5,58 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Proto to C# Bulk Converter</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        h1 {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: #fff;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            border-radius: 5px;
-        }
-
-        .input-group {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 20px;
-        }
-
-        .input-group input[type="file"] {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #fff;
-            cursor: pointer;
-        }
-
-        .convert-button {
-            background-color: #007BFF;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            padding: 10px 20px;
-            cursor: pointer;
-        }
-
-        .output {
-            border: 1px solid #ccc;
-            padding: 20px;
-            border-radius: 5px;
-        }
-    </style>
+    <link href="Style.css" rel="stylesheet" />
 </head>
 
 <body>
@@ -238,15 +187,9 @@
             function getCSharpClasses(packageName, messages) {
                 var sb = "using System;" + newLine;
 
-                var contractAttribute = "[DataContract]";
-                var memberAttribute = "[DataMember(Order = #)]";
-
                 var usingNamespace = getRadioValue("attributeType");
-                sb += "using " + usingNamespace + ";" + newLine;
-                if (usingNamespace === "ProtoBuf") {
-                    contractAttribute = "[ProtoContract]";
-                    memberAttribute = "[ProtoMember(#)]";
-                }
+                if (usingNamespace != null)
+                    sb += "using " + usingNamespace + ";" + newLine;
 
                 sb += newLine;
                 var tabs = "";
